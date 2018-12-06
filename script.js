@@ -20,6 +20,7 @@ var yVector = new THREE.Vector3(0, 1, 0);
 var zVector = new THREE.Vector3(0, 0, 1);
 
 var ready = false;
+var time = 5000;
 
 //initialize the scene
 init();
@@ -307,20 +308,20 @@ function keydown(ev, camera) {
         case 48: //0
             controls.target = new THREE.Vector3(0, 0, 0);
             camera.position.set(0, 3248, 1000);
+            time = 5000;
             break;
-        case 49: //1
-            if (hobbitHole != undefined) {
-                camera.position.set(-782, 23, -445);
-                animateZ = true;
-            }
+        case 49: //1: hobbitHole
+            controls.target = trueShire;
             break;
-        case 50: //2
-            controls.target = mordor;
+        case 50: //2: isengard
+            controls.target.set(-184, 0, 134);
             break;
-        case 51: //3
-            //controls.target = ringLocation;
-            //camera.position.set(0, -330, 0);
+        case 51: //3: sauron
+            controls.target.set(799, 0, 390);
             console.log(camera.position);
+            break;
+        case 52: //4: animate time = 0
+            time = 0;
             break;
         case 65: //a: animate the project
             if (!ready) {
@@ -330,23 +331,24 @@ function keydown(ev, camera) {
             camera.position.set(0, 3248, 1000);
             controls.target.set(0, 0, 0);
 
+            
             //animate
             var toPos = new THREE.Vector3(-775, 183, -300);
             //Move camera to shire
             var cameraTween1 = new TWEEN.Tween(camera.position)
-                .to(toPos, 5000)
+                .to(toPos, time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move camera target to shire
             var cameraTween2 = new TWEEN.Tween(controls.target)
-                .to(trueShire, 5000)
+                .to(trueShire, time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Rise shire out of ground
             var hobbitHoleTween1 = new TWEEN.Tween(hobbitHole.position)
-                .to(new THREE.Vector3(hobbitHole.position.x, -10, hobbitHole.position.z), 5000)
+                .to(new THREE.Vector3(hobbitHole.position.x, -10, hobbitHole.position.z), time)
                 .easing(TWEEN.Easing.Cubic.Out);
             //Move camera to shire ground level
             var cameraTween3 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(-778, 24, -416), 5000)
+                .to(new THREE.Vector3(-778, 24, -416), time)
                 .easing(TWEEN.Easing.Sinusoidal.InOut);
             //Rotate camera around shire
             /*
@@ -361,19 +363,19 @@ function keydown(ev, camera) {
             */
             //Move camera to mountains
             var cameraTween6 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(-43, 1170, 642), 5000)
+                .to(new THREE.Vector3(-43, 1170, 642), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move target to mountains
             var cameraTween7 = new TWEEN.Tween(controls.target)
-                .to(new THREE.Vector3(0, 20, -400), 5000)
+                .to(new THREE.Vector3(0, 20, -400), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move target to first mountain
             var cameraTween8 = new TWEEN.Tween(controls.target)
-                .to(new THREE.Vector3(22, 50, -800), 5000)
+                .to(new THREE.Vector3(22, 50, -800), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move camera to fist mountain
             var cameraTween9 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(22, 126, -535), 5000)
+                .to(new THREE.Vector3(22, 126, -535), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
 
             var tweenSet = new Array();
@@ -390,25 +392,25 @@ function keydown(ev, camera) {
 
             //Move camera backwards from the mountains
             var cameraTween10 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(-159, 126, 239), 5000)
+                .to(new THREE.Vector3(-159, 126, 239), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             var cameraTween11 = new TWEEN.Tween(controls.target)
-                .to(new THREE.Vector3(-150, 50, 0), 5000)
+                .to(new THREE.Vector3(-150, 50, 0), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move target to isengard
             var cameraTween12 = new TWEEN.Tween(controls.target)
-                .to(new THREE.Vector3(-220, -10, 50), 5000)
+                .to(new THREE.Vector3(-220, -10, 50), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move camera to isengard
             var cameraTween13 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(-215, 175, 159), 5000)
+                .to(new THREE.Vector3(-215, 175, 159), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             var cameraTween14 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(-215, 10, 61), 5000)
+                .to(new THREE.Vector3(-215, 10, 61), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Rise isengard
             var isengardTween1 = new TWEEN.Tween(isengard.position)
-                .to(new THREE.Vector3(isengard.position.x, 30, isengard.position.z), 5000)
+                .to(new THREE.Vector3(isengard.position.x, 30, isengard.position.z), time)
                 .easing(TWEEN.Easing.Quadratic.InOut)
                 .onUpdate(function () {
                     if (controls.target.y < 30) {
@@ -418,27 +420,27 @@ function keydown(ev, camera) {
                 });
             //Move camera to view isengard
             var cameraTween15 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(-184,5,134), 5000)
+                .to(new THREE.Vector3(-184, 5, 134), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move camera to mordor
             var cameraTween16 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(962, 1209, 817), 5000)
+                .to(new THREE.Vector3(962, 1209, 817), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move target to mordor
             var cameraTween17 = new TWEEN.Tween(controls.target)
-                .to(new THREE.Vector3(958,0,592), 5000)
+                .to(new THREE.Vector3(958, 0, 592), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move camera to sauron
             var cameraTween18 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(799, 147, 445), 5000)
+                .to(new THREE.Vector3(799, 147, 445), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move target to sauron
             var cameraTween19 = new TWEEN.Tween(controls.target)
-                .to(new THREE.Vector3(799, 0, 390), 5000)
+                .to(new THREE.Vector3(799, 0, 390), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move camera closer to sauron
             var cameraTween20 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(799, 0.4, 400), 5000)
+                .to(new THREE.Vector3(799, 0.4, 400), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move sauron from ground
             var sauronTween1 = new TWEEN.Tween(sauron.position)
@@ -446,23 +448,23 @@ function keydown(ev, camera) {
                 .easing(TWEEN.Easing.Quartic.Out);
             //Move camera to eye
             var cameraTween21 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(799, 51, 400), 5000)
+                .to(new THREE.Vector3(799, 51, 400), time)
                 .easing(TWEEN.Easing.Quartic.Out);
             //Move target to eye
             var cameraTween22 = new TWEEN.Tween(controls.target)
-                .to(new THREE.Vector3(799, 51, 390), 5000)
+                .to(new THREE.Vector3(799, 51, 390), time)
                 .easing(TWEEN.Easing.Quartic.Out);
             //Move camera to see sauron
             var cameraTween23 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(799, 78, 546), 5000)
+                .to(new THREE.Vector3(799, 78, 546), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move camera to ring
             var cameraTween24 = new TWEEN.Tween(camera.position)
-                .to(new THREE.Vector3(0, 3248, 1000), 5000)
+                .to(new THREE.Vector3(0, 3248, 1000), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
             //Move target to origin
             var cameraTween25 = new TWEEN.Tween(controls.target)
-                .to(new THREE.Vector3(0, 0, 0), 5000)
+                .to(new THREE.Vector3(0, 0, 0), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
 
             //Tween playing

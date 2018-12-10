@@ -2,12 +2,14 @@
 var scene, camera, renderer, controls, object, hobbitHole, sauron, sauronTarget, mountain1, mountain2, mountainSet, isengard, isengardLocation, ring, ringLocation;
 
 var animateZ = false;
+//These are locations of different places in the scene
 var origin = new THREE.Vector3(0, 0, 0);
 var shire = new THREE.Vector3(-778, 540, 0);
 var trueShire = new THREE.Vector3(-778, 0, -540);
 var mordor = new THREE.Vector3(800, 0, 390);
 var isengardLocation = new THREE.Vector3(-220, 0, 50);
 var ringLocation = new THREE.Vector3(0, 3100, 950);
+//This uses the cubic bezier curve function to create a path for the mountain range
 var mountainRange = new THREE.CubicBezierCurve3(
     new THREE.Vector3(-150, 0, 0),
     new THREE.Vector3(-130, 0, -200),
@@ -15,10 +17,12 @@ var mountainRange = new THREE.CubicBezierCurve3(
     new THREE.Vector3(22,0,-800)
 );
 
+//Vectors for each of the directions
 var xVector = new THREE.Vector3(1, 0, 0);
 var yVector = new THREE.Vector3(0, 1, 0);
 var zVector = new THREE.Vector3(0, 0, 1);
 
+//Variables for animation timing
 var ready = false;
 var time = 5000;
 
@@ -32,6 +36,7 @@ function init() {
     var WIDTH = window.innerWidth;
     var HEIGHT = window.innerHeight;
     scene = new THREE.Scene();
+    //Background of the scene, created in a graphics program
     var background = new THREE.TextureLoader().load("background.jpg");
     scene.background = background;
 
@@ -65,6 +70,7 @@ function init() {
     var light = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(light);
 
+    //Set the target for sauron's tower
     sauronTarget = new THREE.Object3D();
     sauronTarget.position.set(mordor.x, 0, mordor.z);
     scene.add(sauronTarget);
@@ -72,20 +78,25 @@ function init() {
     //Texture from https://www.donsmaps.com/middleearthmap.html
     var texture = new THREE.TextureLoader().load("middle_earth.jpg");
 
+    //Background Lord of the Rings map for the scene, rendered as a three.js plane
     var geometry = new THREE.PlaneBufferGeometry(3200, 2400);
     var material = new THREE.MeshBasicMaterial({ map: texture });
     material.side = THREE.DoubleSide;
     var plane = new THREE.Mesh(geometry, material);
+    //Rotate the plane so that it becomes an xz-plane, where the y-axis points away from the plane
+    //This makes it easier to load in the objects later on, because I will not have to rotate them
     plane.rotation.x = -Math.PI / 2;
 
     scene.add(plane);
 
+    //Calculate the points for each of the 15 mountians in the scene using the mountainRange curve
     var points = mountainRange.getPoints(15);
 
     //Load hobbit hole
     //Model from https://3dwarehouse.sketchup.com/model/2d102601-c7b9-4e84-9530-244683b19d24/Hobbit-hole?hl=en
     var loader1 = new THREE.ColladaLoader();
     loader1.load("hobbit+hole+final/model.dae", function (collada) {
+        //Load model, rescale, and move to the correct location
         hobbitHole = collada.scene;
         hobbitHole.scale.set(0.1, 0.1, 0.1);
         hobbitHole.castShadow = true;
@@ -93,29 +104,31 @@ function init() {
         hobbitHole.translateY(shire.y);
         hobbitHole.translateZ(shire.z-100);
 
-        //remove Gandalf
+        //remove Gandalf image which was initially in the model
         for (var i = 0; i < hobbitHole.children[0].children.length; i++) {
             if (hobbitHole.children[0].children[i].name == "_2D_Gandalf") {
                 hobbitHole.children[0].remove(hobbitHole.children[0].children[i]);
             }
         }
 
+        //Add the updated model to the scene
         scene.add(hobbitHole);
     }, undefined, function (error) {
         console.log(error);
     });
 
+    //Load sauron's tower
+    //Model from https://sketchfab.com/models/fadecd2a323b47dab09f7e27402e521d
     var loader2 = new THREE.GLTFLoader();
     loader2.load("the_eye_of_sauron_lord_of_the_rings/scene.gltf", function (gltf) {
+        //Load in the model, resize, and translate to its correct position
         sauron = gltf.scene;
         sauron.scale.set(0.1, 0.1, 0.1);
-        //sauron.castShadow = true;
-
         sauron.translateX(mordor.x);
         sauron.translateY(-29);
         sauron.translateZ(mordor.z);
 
-        //Get tower object
+        //Get tower part of model for editing
         var tower = sauron.children[0].children[0].children[0].children[0].children[0];
 
         //Change tower's material color and type to lambert material
@@ -129,34 +142,22 @@ function init() {
         console.log(error);
         });
 
-    /*
-    //Model from https://sketchfab.com/models/12b29bb3ff554a6fbad3d6b6a2519236
-    var loader3 = new THREE.GLTFLoader();
-    loader3.load("mountain1/scene.gltf", function (gltf) {
-        mountain1 = gltf.scene;
-        
-        var scale = 50;
-        mountain1.scale.set(scale, scale, scale);
-        mountain1.translateX(-scale/2);
-        mountain1.translateY(scale);
-        mountain1.translateZ(scale/2);
+    //There used to be a loader3 for a different mountain model, but it was removed
+    //This is also why the mountain model used is called "mountain2"
 
-        //scene.add(mountain1);
-    }, undefined, function (error) {
-        console.log(error);
-    });*/
-
+    //Load mountains for mountain range
     //Model from https://sketchfab.com/models/cafd463503ba4724a7aadff917786cd5
     var loader4 = new THREE.GLTFLoader();
     loader4.load("mountain2/scene.gltf", function (gltf) {
+        //Load in model, resize, and translate to the origin
         mountain2 = gltf.scene;
-
         var scale = 15;
         mountain2.scale.set(scale, scale, scale);
         mountain2.translateX(-scale);
         mountain2.translateY(-scale/2);
         mountain2.translateZ(-scale);
 
+        //mountainSet is an array which will hold multiple copies of the mountian model
         mountainSet = new Array();
         //Add the mountains to a curve for the mountain range
         for (var i = 0; i < points.length; i++) {
@@ -188,9 +189,11 @@ function init() {
         console.log(error);
         });
 
+    //Isengard tower model
     //Model from https://sketchfab.com/models/62a7642c92804387b99a73ae6844de06
     var loader5 = new THREE.GLTFLoader();
     loader5.load("isengard/scene.gltf", function (gltf) {
+        //Load in tower, scale, and translate to correct position
         isengard = gltf.scene;
 
         var scale = 30;
@@ -209,12 +212,13 @@ function init() {
             return d;
         });
 
-        
+        //Add modified model to scene
         scene.add(isengard);
     }, undefined, function (error) {
         console.log(error);
         });
 
+    //Load the one ring model
     //Model from https://sketchfab.com/models/e63a62533f514c808b4f0770241a31e7
     var loader6 = new THREE.GLTFLoader();
     loader6.load("ring/scene.gltf", function (gltf) {
@@ -262,40 +266,25 @@ function animate() {
         }
     }
     else {
-        //Animations
+        //Animate the ring when the scene has been loaded
 
-        //Ring
+        //Ring rotation
         ring.rotateY(0.02);
         ring.rotateOnWorldAxis(xVector, 0.02);
         ring.rotateOnWorldAxis(zVector, 0.02);
 
-        /*
-        var maxHeight = -8;
-        var startHeight = -50;
-        var mountainSpeed = 1;
-
-        for (var i = 0; i < mountainSet.length; i++) {
-            if (mountainSet[i].animate == true) {
-                mountainSet[i].position.y += mountainSpeed;
-                if (mountainSet[i].position.y >= maxHeight) {
-                    mountainSet[i].animate = false;
-                }
-                else if (mountainSet[i].position.y >= startHeight && mountainSet.length != i+1) {
-                    mountainSet[i + 1].animate = true;
-                }
-            }
-        }*/
-
     }
     
-
+    //Update the tween.js animations
     TWEEN.update();
 
+    //Re-render the scene
     renderer.render(scene, camera);
     //Update the controls for the camera
     controls.update();
 }
 
+//Random function. I don't know if I even used it
 function degToRad(deg) {
     return deg * Math.PI / 180;
 }
@@ -303,7 +292,7 @@ function degToRad(deg) {
 //Keystroke function
 function keydown(ev, camera) {
 
-    //set the animation on
+    //Switch for different keys pressed
     switch (ev.keyCode) {
         case 48: //0
             controls.target = new THREE.Vector3(0, 0, 0);
@@ -324,10 +313,12 @@ function keydown(ev, camera) {
             time = 0;
             break;
         case 65: //a: animate the project
+            //Make sure all the models are loaded first
             if (!ready) {
                 break;
             }
 
+            //Reset the camera position and target
             camera.position.set(0, 3248, 1000);
             controls.target.set(0, 0, 0);
 
@@ -377,7 +368,7 @@ function keydown(ev, camera) {
             var cameraTween9 = new TWEEN.Tween(camera.position)
                 .to(new THREE.Vector3(22, 126, -535), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
-
+            //Set of tweens to move each mountain individually
             var tweenSet = new Array();
             for (var i = 0; i < mountainSet.length; i++) {
                 var tween = new TWEEN.Tween(mountainSet[i].position)
@@ -467,7 +458,7 @@ function keydown(ev, camera) {
                 .to(new THREE.Vector3(0, 0, 0), time)
                 .easing(TWEEN.Easing.Cubic.InOut);
 
-            //Tween playing
+            //Start tween animations
             cameraTween1.start();
             cameraTween2.start();
             cameraTween2.chain(hobbitHoleTween1.delay(4000), cameraTween3.delay(2000));
